@@ -84,7 +84,6 @@ services:
     logging:
       driver: "json-file"
     ports:
-      - "22"
       - "80"
       - "443"
     working_dir: "/tmp"
