@@ -63,16 +63,6 @@ Available commands:\n\
   - con-top:		Shows processes of containers, using docker.\n\
   - con-logs:		Shows logs of containers, using docker-compose.\n\
   - con-events:		Shows events of containers, using docker-compose.\n\
-- for networks:\n\
-  - net-ls:		Lists networks, using docker network.\n\
-  - net-create:		Creates networks, using docker network.\n\
-  - net-rm:		Removes networks, using docker network.\n\
-  - net-inspect:	Inspects networks, using docker network.\n\
-- for volumes:\n\
-  - vol-ls:		Lists volumes, using docker volume.\n\
-  - vol-create:		Creates volumes, using docker volume.\n\
-  - vol-rm:		Removes volumes, using docker volume.\n\
-  - vol-inspect:	Inspects volumes, using docker volume.\n\
 \n\
 Available distributions:\n\
 - debian8\n\
@@ -89,8 +79,6 @@ Example #2: quick start, with pull\n\
 \n\
 Example #3: manual steps, with build\n\
  make img-build DISTRO=debian8;\n\
- make net-create DISTRO=debian8;\n\
- make vol-create DISTRO=debian8;\n\
  make con-create DISTRO=debian8;\n\
  make con-start DISTRO=debian8;\n\
  make con-ls DISTRO=debian8;\n\
@@ -148,30 +136,30 @@ purge:
         ifeq ($(DISTRO), all)
 		@echo Purging containers, networks, volumes and images for debian8...
 		bash -c "(cd debian8; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi stafli/stafli.httpd.web:debian8_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.proxy:debian8_httpd24_proxy;
 		@echo
 		@echo Purging containers, networks, volumes and images for debian7...
 		bash -c "(cd debian7; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi stafli/stafli.httpd.web:debian7_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.proxy:debian7_httpd22_proxy;
 		@echo
 		@echo Purging containers, networks, volumes and images for centos7...
 		bash -c "(cd centos7; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi stafli/stafli.httpd.web:centos7_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.proxy:centos7_httpd24_proxy;
 		@echo
 		@echo Purging containers, networks, volumes and images for centos6...
 		bash -c "(cd centos6; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi stafli/stafli.httpd.web:centos6_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.proxy:centos6_httpd22_proxy;
         else
 		@echo Purging containers, networks, volumes and images for $(DISTRO)...
 		bash -c "(cd $(DISTRO); set -o allexport; source .env; set +o allexport; docker-compose down)";
                 ifeq ($(DISTRO), debian8)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd24_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd24_proxy;
                 else ifeq ($(DISTRO), debian7)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd22_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd22_proxy;
                 else ifeq ($(DISTRO), centos7)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd24_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd24_proxy;
                 else ifeq ($(DISTRO), centos6)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd22_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd22_proxy;
                 endif
         endif
 
@@ -182,19 +170,19 @@ img-ls:
 	@echo
         ifeq ($(DISTRO), all)
 		@echo Listing images for debian8...
-		docker images | grep -E "solict/high-performance-php-stack.*debian8" | sort -n;
+		docker images | grep -E "stafli/stafli.httpd.proxy.*debian8" | sort -n;
 		@echo
 		@echo Listing images for debian7...
-		docker images | grep -E "solict/high-performance-php-stack.*debian7" | sort -n;
+		docker images | grep -E "stafli/stafli.httpd.proxy.*debian7" | sort -n;
 		@echo
 		@echo Listing images for centos7...
-		docker images | grep -E "solict/high-performance-php-stack.*centos7" | sort -n;
+		docker images | grep -E "stafli/stafli.httpd.proxy.*centos7" | sort -n;
 		@echo
 		@echo Listing images for centos6...
-		docker images | grep -E "solict/high-performance-php-stack.*centos6" | sort -n;
+		docker images | grep -E "stafli/stafli.httpd.proxy.*centos6" | sort -n;
         else
 		@echo Listing images for $(DISTRO)...
-		docker images | grep -E "solict/high-performance-php-stack.*$(DISTRO)" | sort -n;
+		docker images | grep -E "stafli/stafli.httpd.proxy.*$(DISTRO)" | sort -n;
         endif
 
 
@@ -248,26 +236,26 @@ img-rm:
 	@echo
         ifeq ($(DISTRO), all)
 		@echo Removing images for debian8...
-		docker rmi stafli/stafli.httpd.web:debian8_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.proxy:debian8_httpd24_proxy;
 		@echo
 		@echo Removing images for debian7...
-		docker rmi stafli/stafli.httpd.web:debian7_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.proxy:debian7_httpd22_proxy;
 		@echo
 		@echo Removing images for centos7...
-		docker rmi stafli/stafli.httpd.web:centos7_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.proxy:centos7_httpd24_proxy;
 		@echo
 		@echo Removing images for centos6...
-		docker rmi stafli/stafli.httpd.web:centos6_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.proxy:centos6_httpd22_proxy;
         else
 		@echo Removing images for $(DISTRO)...
                 ifeq ($(DISTRO), debian8)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd24_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd24_proxy;
                 else ifeq ($(DISTRO), debian7)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd22_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd22_proxy;
                 else ifeq ($(DISTRO), centos7)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd24_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd24_proxy;
                 else ifeq ($(DISTRO), centos6)
-			docker rmi solict/high-performance-php-stack:$(DISTRO)_httpd22_proxy;
+			docker rmi stafli/stafli.httpd.proxy:$(DISTRO)_httpd22_proxy;
                 endif
         endif
 
@@ -608,182 +596,6 @@ con-events:
         else
 		@echo Showing events of containers for $(DISTRO)...
 		bash -c "(cd $(DISTRO); set -o allexport; source .env; set +o allexport; docker-compose events)";
-        endif
-
-
-net-ls:
-	@echo
-	@echo Listing networks...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Listing networks for debian8...
-		docker network ls | grep -E "debian8" | sort -n;
-		@echo
-		@echo Listing networks for debian7...
-		docker network ls | grep -E "debian7" | sort -n;
-		@echo
-		@echo Listing networks for centos7...
-		docker network ls | grep -E "centos7" | sort -n;
-		@echo
-		@echo Listing networks for centos6...
-		docker network ls | grep -E "centos6" | sort -n;
-        else
-		@echo Listing networks for $(DISTRO)...
-		docker network ls | grep -E "$(DISTRO)" | sort -n;
-        endif
-
-
-net-create:
-	@echo
-	@echo Creating networks...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Creating networks for debian8...
-		docker network create debian8_proxy;
-		docker network create debian8_frontend;
-		@echo
-		@echo Creating networks for debian7...
-		docker network create debian7_proxy;
-		docker network create debian7_frontend;
-		@echo
-		@echo Creating networks for centos7...
-		docker network create centos7_proxy;
-		docker network create centos7_frontend;
-		@echo
-		@echo Creating networks for centos6...
-		docker network create centos6_proxy;
-		docker network create centos6_frontend;
-        else
-		@echo Creating networks for $(DISTRO)...
-		docker network create $(DISTRO)_proxy;
-		docker network create $(DISTRO)_frontend;
-        endif
-
-
-net-rm:
-	@echo
-	@echo Removing networks...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Removing networks for debian8...
-		docker network rm debian8_proxy;
-		docker network rm debian8_frontend;
-		@echo
-		@echo Removing networks for debian7...
-		docker network rm debian7_proxy;
-		docker network rm debian7_frontend;
-		@echo
-		@echo Removing networks for centos7...
-		docker network rm centos7_proxy;
-		docker network rm centos7_frontend;
-		@echo
-		@echo Removing networks for centos6...
-		docker network rm centos6_proxy;
-		docker network rm centos6_frontend;
-        else
-		@echo Removing networks for $(DISTRO)...
-		docker network rm $(DISTRO)_proxy;
-		docker network rm $(DISTRO)_frontend;
-        endif
-
-
-net-inspect:
-	@echo
-	@echo Inspecting networks...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Inspecting networks for debian8...
-		docker network inspect debian8_proxy;
-		docker network inspect debian8_frontend;
-		@echo
-		@echo Inspecting networks for debian7...
-		docker network inspect debian7_proxy;
-		docker network inspect debian7_frontend;
-		@echo
-		@echo Inspecting networks for centos7...
-		docker network inspect centos7_proxy;
-		docker network inspect centos7_frontend;
-		@echo
-		@echo Inspecting networks for centos6...
-		docker network inspect centos6_proxy;
-		docker network inspect centos6_frontend;
-        else
-		@echo Inspecting networks for $(DISTRO)...
-		docker network inspect $(DISTRO)_proxy;
-		docker network inspect $(DISTRO)_frontend;
-        endif
-
-
-vol-ls:
-	@echo
-	@echo Listing volumes...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Listing volumes for debian8...
-		docker volume ls | grep -E "debian8" | sort -n;
-		@echo
-		@echo Listing volumes for debian7...
-		docker volume ls | grep -E "debian7" | sort -n;
-		@echo
-		@echo Listing volumes for centos7...
-		docker volume ls | grep -E "centos7" | sort -n;
-		@echo
-		@echo Listing volumes for centos6...
-		docker volume ls | grep -E "centos6" | sort -n;
-        else
-		@echo Listing volumes for $(DISTRO)...
-		docker volume ls | grep -E "$(DISTRO)" | sort -n;
-        endif
-
-
-vol-create:
-	@echo
-	@echo Creating volumes...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Creating volumes for debian8...
-		@echo
-		@echo Creating volumes for debian7...
-		@echo
-		@echo Creating volumes for centos7...
-		@echo
-		@echo Creating volumes for centos6...
-        else
-		@echo Creating volumes for $(DISTRO)...
-        endif
-
-
-vol-rm:
-	@echo
-	@echo Removing volumes...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Removing volumes for debian8...
-		@echo
-		@echo Removing volumes for debian7...
-		@echo
-		@echo Removing volumes for centos7...
-		@echo
-		@echo Removing volumes for centos6...
-        else
-		@echo Removing volumes for $(DISTRO)...
-        endif
-
-
-vol-inspect:
-	@echo
-	@echo Inspecting volumes...
-	@echo
-        ifeq ($(DISTRO), all)
-		@echo Inspecting volumes for debian8...
-		@echo
-		@echo Inspecting volumes for debian7...
-		@echo
-		@echo Inspecting volumes for centos7...
-		@echo
-		@echo Inspecting volumes for centos6...
-        else
-		@echo Inspecting volumes for $(DISTRO)...
         endif
 
 

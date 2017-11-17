@@ -83,41 +83,10 @@ services:
         app_httpd_vhost_httpd_wlist: "ip 127.0.0.1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
     logging:
       driver: "json-file"
-    networks:
-      - proxy
-      - frontend
     ports:
       - "22"
       - "80"
       - "443"
     working_dir: "/tmp"
     command: "/usr/bin/supervisord -c /etc/supervisor/supervisord.conf --nodaemon"
-
-#
-# Networks
-#
-networks:
-  default:
-    driver: "bridge"
-  proxy:
-    driver: "bridge"
-  frontend:
-    driver: "bridge"
-  application:
-    driver: "bridge"
-  backend:
-    driver: "bridge"
-
-#
-# Volumes
-#
-volumes:
-  memcached14_data:
-    driver: "local"
-  redis32_data:
-    driver: "local"
-  mariadb10_data:
-    driver: "local"
-  web_data:
-    driver: "local"
 
