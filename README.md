@@ -1,6 +1,7 @@
 # Stafli HTTPd Proxy Server
 Stafli HTTPd Proxy Server builds based on [Debian](https://www.debian.org/) and [CentOS](https://www.centos.org/), and developed as scripts for [Docker](https://www.docker.com/).  
-Continues on [Stafli Base System](https://github.com/stafli-org/stafli.base.system) builds.
+Continues on [Stafli Base System](https://github.com/stafli-org/stafli.base.system) builds.  
+This project is part of the [Stafli Application Stack](https://github.com/stafli-org/).
 
 Requires [Docker Compose](https://docs.docker.com/compose/) 1.6.x or higher due to the [version 2](https://docs.docker.com/compose/compose-file/#versioning) format of the docker-compose.yml files.
 
@@ -22,11 +23,11 @@ The services use custom images as a starting point:
 
 ## Services
 These are the services described by the dockerfile and docker-compose files:
-- HTTPd 2.2.x/2.4.x Proxy, adds HTTPd on top of upstream Base service
+- HTTPd 2.2.x/2.4.x Proxy, built on Stafli Base System and additional HTTPd packages
 
 ## Images
 These are the [resulting images](https://hub.docker.com/r/stafli/stafli.httpd.proxy/tags/) upon building:
-- HTTPd 2.x.x Proxy service:
+- HTTPd 2.2.x/2.4.x Proxy:
   - stafli/stafli.httpd.proxy:debian8_httpd24_proxy
   - stafli/stafli.httpd.proxy:debian7_httpd22_proxy
   - stafli/stafli.httpd.proxy:centos7_httpd24_proxy
@@ -34,7 +35,7 @@ These are the [resulting images](https://hub.docker.com/r/stafli/stafli.httpd.pr
 
 ## Containers
 These containers can be created from the images:
-- HTTPd 2.x.x Proxy service:
+- HTTPd 2.2.x/2.4.x Proxy:
   - debian8_httpd24_proxy_xxx
   - debian7_httpd22_proxy_xxx
   - centos7_httpd24_proxy_xxx
@@ -57,7 +58,7 @@ Example:
 ```
 docker pull stafli/stafli.httpd.proxy:debian8_httpd24_proxy
 
-docker run -ti stafli/stafli.httpd.proxy:debian8_memcached14 /bin/bash
+docker run -ti stafli/stafli.httpd.proxy:debian8_httpd24_proxy /bin/bash
 ```
 
 ### From GitHub repository (automated)
