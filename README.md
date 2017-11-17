@@ -28,18 +28,18 @@ These are the services described by the dockerfile and docker-compose files:
 ## Images
 These are the [resulting images](https://hub.docker.com/r/stafli/stafli.httpd.proxy/tags/) upon building:
 - HTTPd 2.2.x/2.4.x Proxy:
-  - stafli/stafli.httpd.proxy:debian8_httpd24_proxy
-  - stafli/stafli.httpd.proxy:debian7_httpd22_proxy
-  - stafli/stafli.httpd.proxy:centos7_httpd24_proxy
-  - stafli/stafli.httpd.proxy:centos6_httpd22_proxy
+  - stafli/stafli.httpd.proxy:debian8_httpd24
+  - stafli/stafli.httpd.proxy:debian7_httpd22
+  - stafli/stafli.httpd.proxy:centos7_httpd24
+  - stafli/stafli.httpd.proxy:centos6_httpd22
 
 ## Containers
 These containers can be created from the images:
 - HTTPd 2.2.x/2.4.x Proxy:
-  - debian8_httpd24_proxy_xxx
-  - debian7_httpd22_proxy_xxx
-  - centos7_httpd24_proxy_xxx
-  - centos6_httpd22_proxy_xxx
+  - debian8_httpd24_xxx
+  - debian7_httpd22_xxx
+  - centos7_httpd24_xxx
+  - centos6_httpd22_xxx
 
 ## Usage
 
@@ -56,9 +56,9 @@ Where <image_url> is the full image url (lookup the image list above).
 
 Example:
 ```
-docker pull stafli/stafli.httpd.proxy:debian8_httpd24_proxy
+docker pull stafli/stafli.httpd.proxy:debian8_httpd24
 
-docker run -ti stafli/stafli.httpd.proxy:debian8_httpd24_proxy /bin/bash
+docker run -ti stafli/stafli.httpd.proxy:debian8_httpd24 /bin/bash
 ```
 
 ### From GitHub repository (automated)
