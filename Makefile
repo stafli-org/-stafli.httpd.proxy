@@ -147,19 +147,19 @@ purge:
         ifeq ($(DISTRO), all)
 		@echo Purging containers, networks, volumes and images for debian8...
 		bash -c "(cd debian8; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi solict/high-performance-php-stack:debian8_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.web:debian8_httpd24_proxy;
 		@echo
 		@echo Purging containers, networks, volumes and images for debian7...
 		bash -c "(cd debian7; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi solict/high-performance-php-stack:debian7_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.web:debian7_httpd22_proxy;
 		@echo
 		@echo Purging containers, networks, volumes and images for centos7...
 		bash -c "(cd centos7; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi solict/high-performance-php-stack:centos7_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.web:centos7_httpd24_proxy;
 		@echo
 		@echo Purging containers, networks, volumes and images for centos6...
 		bash -c "(cd centos6; set -o allexport; source .env; set +o allexport; docker-compose down)";
-		docker rmi solict/high-performance-php-stack:centos6_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.web:centos6_httpd22_proxy;
         else
 		@echo Purging containers, networks, volumes and images for $(DISTRO)...
 		bash -c "(cd $(DISTRO); set -o allexport; source .env; set +o allexport; docker-compose down)";
@@ -247,16 +247,16 @@ img-rm:
 	@echo
         ifeq ($(DISTRO), all)
 		@echo Removing images for debian8...
-		docker rmi solict/high-performance-php-stack:debian8_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.web:debian8_httpd24_proxy;
 		@echo
 		@echo Removing images for debian7...
-		docker rmi solict/high-performance-php-stack:debian7_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.web:debian7_httpd22_proxy;
 		@echo
 		@echo Removing images for centos7...
-		docker rmi solict/high-performance-php-stack:centos7_httpd24_proxy;
+		docker rmi stafli/stafli.httpd.web:centos7_httpd24_proxy;
 		@echo
 		@echo Removing images for centos6...
-		docker rmi solict/high-performance-php-stack:centos6_httpd22_proxy;
+		docker rmi stafli/stafli.httpd.web:centos6_httpd22_proxy;
         else
 		@echo Removing images for $(DISTRO)...
                 ifeq ($(DISTRO), debian8)

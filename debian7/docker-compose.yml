@@ -41,7 +41,7 @@ services:
       - "architecture=$BUILD_ARCH"
       - "org.label-schema.version=$BUILD_VERSION"
       - "org.label-schema.build-date=$BUILD_DATE"
-    image: "solict/high-performance-php-stack:debian7_httpd22_proxy"
+    image: "stafli/stafli.httpd.proxy:debian7_httpd22_proxy"
     build:
       context: "./dockerfiles"
       dockerfile: "httpd22-proxy.dockerfile"
@@ -69,9 +69,9 @@ services:
         app_httpd_vhost_listen_port_https: "443"
         app_httpd_vhost_httpd_wlist: "127.0.0.1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
     depends_on:
-      - httpd22_web
+      - httpd22_proxy
     links:
-      - httpd22_web
+      - httpd22_proxy
     logging:
       driver: "json-file"
     networks:
