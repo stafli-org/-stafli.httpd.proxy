@@ -1,9 +1,9 @@
 # Stafli HTTPd Proxy Server
-Stafli HTTPd Proxy Server builds based on [Debian](https://www.debian.org/) and [CentOS](https://www.centos.org/), and developed as scripts for [Docker](https://www.docker.com/).  
+Stafli HTTPd Proxy Server builds based on [Debian](https://www.debian.org) and [CentOS](https://www.centos.org), and developed as scripts for [Docker](https://www.docker.com).  
 Continues on [Stafli Base System](https://github.com/stafli-org/stafli.base.system) builds.  
-This project is part of the [Stafli Application Stack](https://github.com/stafli-org/).
+This project is part of the [Stafli Application Stack](https://github.com/stafli-org).
 
-Requires [Docker Compose](https://docs.docker.com/compose/) 1.6.x or higher due to the [version 2](https://docs.docker.com/compose/compose-file/#versioning) format of the docker-compose.yml files.
+Requires [Docker Compose](https://docs.docker.com/compose) 1.6.x or higher due to the [version 2](https://docs.docker.com/compose/compose-file/#versioning) format of the docker-compose.yml files.
 
 There are docker-compose.yml files per distribution, as well as docker-compose.override.yml and .env files, which may be used to override configuration.
 An optional [Makefile](../../tree/master/Makefile) is provided to help with loading these with ease and perform commands in batch.
@@ -13,21 +13,22 @@ Scripts are also provided for each distribution to help test and deploy the inst
 The images are automatically built at a [repository](https://hub.docker.com/r/stafli/stafli.httpd.proxy) in the Docker Hub registry.
 
 ## Distributions
-The services use custom images as a starting point:
-- __Debian__, from the [Stafli Base System](https://github.com/stafli-org/stafli.base.system)
+The services use custom images as a starting point for the following distributions:
+- __Debian__, from the [official repository](https://hub.docker.com/_/debian)
   - [Debian 8 (jessie)](../../tree/master/debian8)
   - [Debian 7 (wheezy)](../../tree/master/debian7)
-- __CentOS__, from the [Stafli Base System](https://github.com/stafli-org/stafli.base.system)
+- __CentOS__, from the [official repository](https://hub.docker.com/_/centos)
   - [CentOS 7 (centos7)](../../tree/master/centos7)
   - [CentOS 6 (centos6)](../../tree/master/centos6)
 
 ## Services
 These are the services described by the dockerfile and docker-compose files:
-- HTTPd 2.2.x/2.4.x Proxy, built on Stafli Base System and additional HTTPd packages
+- HTTPd 2.2.x (debian7 and centos6), built on [Stafli Base System](https://github.com/stafli-org/stafli.base.system) and additional [Apache HTTPd](https://httpd.apache.org) packages
+- HTTPd 2.4.x (debian8 and centos7), built on [Stafli Base System](https://github.com/stafli-org/stafli.base.system) and additional [Apache HTTPd](https://httpd.apache.org) packages
 
 ## Images
-These are the [resulting images](https://hub.docker.com/r/stafli/stafli.httpd.proxy/tags/) upon building:
-- HTTPd 2.2.x/2.4.x Proxy:
+These are the [resulting images](https://hub.docker.com/r/stafli/stafli.httpd.proxy/tags) upon building:
+- HTTPd 2.2.x/2.4.x:
   - stafli/stafli.httpd.proxy:debian8_httpd24
   - stafli/stafli.httpd.proxy:debian7_httpd22
   - stafli/stafli.httpd.proxy:centos7_httpd24
@@ -35,7 +36,7 @@ These are the [resulting images](https://hub.docker.com/r/stafli/stafli.httpd.pr
 
 ## Containers
 These containers can be created from the images:
-- HTTPd 2.2.x/2.4.x Proxy:
+- HTTPd 2.2.x/2.4.x:
   - debian8_httpd24_xxx
   - debian7_httpd22_xxx
   - centos7_httpd24_xxx
