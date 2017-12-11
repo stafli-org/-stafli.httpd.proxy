@@ -27,7 +27,7 @@ version: '2'
 #
 services:
 
-  centos6_httpd22_proxy:
+  proxy_httpd22_centos6:
     labels:
       - "org.label-schema.schema-version=1.0"
       - "org.label-schema.name=$PROJECT_NAME"
@@ -54,7 +54,7 @@ services:
       - "org.label-schema.os-architecture=$BUILD_ARCH"
       - "org.label-schema.version=$BUILD_VERSION"
       - "org.label-schema.build-date=$BUILD_DATE"
-    image: "${IMAGE_URL_PREFIX}:centos6_httpd22"
+    image: "${IMAGE_URL_PREFIX}:httpd22_centos6"
     build:
       context: "./dockerfiles"
       dockerfile: "httpd22.dockerfile"
