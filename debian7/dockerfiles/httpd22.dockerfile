@@ -19,7 +19,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#
+# Build
+#
+
+# Base image to use
 FROM stafli/stafli.system.base:base10_debian7
+
+# Labels to apply
+LABEL description="Stafli HTTP Proxy Server (stafli/stafli.proxy.httpd), Based on Stafli Base System (stafli/stafli.system.base)" \
+      maintainer="lp@algarvio.org" \
+      org.label-schema.schema-version="1.0.0-rc.1" \
+      org.label-schema.name="Stafli HTTP Proxy Server (stafli/stafli.proxy.httpd)" \
+      org.label-schema.description="Based on Stafli Base System (stafli/stafli.system.base)" \
+      org.label-schema.keywords="stafli, httpd, proxy, debian, centos" \
+      org.label-schema.url="https://stafli.org/" \
+      org.label-schema.license="GPLv3" \
+      org.label-schema.vendor-name="Stafli" \
+      org.label-schema.vendor-email="info@stafli.org" \
+      org.label-schema.vendor-website="https://www.stafli.org" \
+      org.label-schema.authors.lpalgarvio.name="Luis Pedro Algarvio" \
+      org.label-schema.authors.lpalgarvio.email="lp@algarvio.org" \
+      org.label-schema.authors.lpalgarvio.homepage="https://lp.algarvio.org" \
+      org.label-schema.authors.lpalgarvio.role="Maintainer" \
+      org.label-schema.registry-url="https://hub.docker.com/r/stafli/stafli.proxy.httpd" \
+      org.label-schema.vcs-url="https://github.com/stafli-org/stafli.proxy.httpd" \
+      org.label-schema.vcs-branch="master" \
+      org.label-schema.os-id="debian" \
+      org.label-schema.os-version-id="7" \
+      org.label-schema.os-architecture="amd64" \
+      org.label-schema.version="1.0"
 
 #
 # Arguments
@@ -49,10 +78,22 @@ ARG app_httpd_vhost_listen_port_https="443"
 ARG app_httpd_vhost_httpd_wlist="127.0.0.1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16"
 
 #
+# Environment
+#
+
+# Working directory to use when executing build and run instructions
+# Defaults to /.
+#WORKDIR /
+
+# User and group to use when executing build and run instructions
+# Defaults to root.
+#USER root:root
+
+#
 # Packages
 #
 
-# Install the HTTPd packages
+# Install httpd packages
 # - apache2: for apache2, the HTTPd server
 # - apache2-utils: for ab and others, the HTTPd utilities
 # - apachetop: for apachetop, the top-like utility for HTTPd
@@ -64,7 +105,7 @@ ARG app_httpd_vhost_httpd_wlist="127.0.0.1 10.0.0.0/8 172.16.0.0/12 192.168.0.0/
 # - ssl-cert: for make-ssl-cert, to generate certificates
 RUN printf "Installing repositories and packages...\n" && \
     \
-    printf "Install the HTTPd packages...\n" && \
+    printf "Install the httpd packages...\n" && \
     apt-get update && apt-get install -qy \
       apache2 \
       apache2-utils apachetop \
@@ -72,8 +113,9 @@ RUN printf "Installing repositories and packages...\n" && \
       libapache2-mod-authnz-external pwauth \
       libapache2-mod-xsendfile libapache2-mod-upload-progress \
       ssl-cert && \
-    printf "Cleanup the Package Manager...\n" && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*; \
+    \
+    printf "Cleanup the package manager...\n" && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
     \
     printf "Finished installing repositories and packages...\n";
 
@@ -91,11 +133,11 @@ RUN printf "Start installing modules...\n" && \
     # Extra modules \
     $(which a2dismod) -f ${app_httpd_global_mods_extra_dis} && \
     $(which a2enmod) -f ${app_httpd_global_mods_extra_en} && \
-    printf "Done enabling/disabling modules...\n"; \
+    printf "Done enabling/disabling modules...\n" && \
     \
-    printf "\n# Checking modules...\n"; \
-    $(which apache2ctl) -l; $(which apache2ctl) -M; \
-    printf "Done checking modules...\n"; \
+    printf "\n# Checking modules...\n" && \
+    $(which apache2ctl) -l; $(which apache2ctl) -M && \
+    printf "Done checking modules...\n" && \
     \
     printf "Finished installing modules...\n";
 
@@ -104,10 +146,11 @@ RUN printf "Start installing modules...\n" && \
 #
 
 # Add users and groups
-RUN printf "Adding users and groups...\n"; \
+RUN printf "Adding users and groups...\n" && \
     \
-    printf "Add httpd user and group...\n"; \
-    id -g ${app_httpd_global_user} || \
+    printf "Add httpd user and group...\n" && \
+    id -g ${app_httpd_global_user} \
+    || \
     groupadd \
       --system ${app_httpd_global_group} && \
     id -u ${app_httpd_global_user} && \
@@ -121,11 +164,12 @@ RUN printf "Adding users and groups...\n"; \
       --system --gid ${app_httpd_global_group} \
       --no-create-home --home-dir ${app_httpd_global_home} \
       --shell /usr/sbin/nologin \
-      ${app_httpd_global_user}; \
+      ${app_httpd_global_user} && \
     \
-    printf "Add vhost user and group...\n"; \
-    app_httpd_vhost_home="${app_httpd_global_home}/${app_httpd_vhost_id}"; \
-    id -g ${app_httpd_vhost_user} || \
+    printf "Add vhost user and group...\n" && \
+    app_httpd_vhost_home="${app_httpd_global_home}/${app_httpd_vhost_id}" && \
+    id -g ${app_httpd_vhost_user} \
+    || \
     groupadd \
       --system ${app_httpd_vhost_group} && \
     id -u ${app_httpd_vhost_user} && \
@@ -139,65 +183,65 @@ RUN printf "Adding users and groups...\n"; \
       --system --gid ${app_httpd_vhost_group} \
       --create-home --home-dir ${app_httpd_vhost_home} \
       --shell /usr/sbin/nologin \
-      ${app_httpd_vhost_user}; \
+      ${app_httpd_vhost_user} && \
     \
-    printf "Setting vhost ownership and permissions...\n"; \
-    mkdir -p ${app_httpd_vhost_home}/bin ${app_httpd_vhost_home}/log ${app_httpd_vhost_home}/html ${app_httpd_vhost_home}/tmp; \
-    chown -R ${app_httpd_global_user}:${app_httpd_global_group} ${app_httpd_vhost_home}; \
-    chmod -R ug=rwX,o=rX ${app_httpd_vhost_home}; \
+    printf "Setting vhost ownership and permissions...\n" && \
+    mkdir -p ${app_httpd_vhost_home}/bin ${app_httpd_vhost_home}/log ${app_httpd_vhost_home}/html ${app_httpd_vhost_home}/tmp && \
+    chown -R ${app_httpd_global_user}:${app_httpd_global_group} ${app_httpd_vhost_home} && \
+    chmod -R ug=rwX,o=rX ${app_httpd_vhost_home} && \
     \
     printf "Finished adding users and groups...\n";
 
 # Supervisor
-RUN printf "Updading Supervisor configuration...\n"; \
+RUN printf "Updading Supervisor configuration...\n" && \
     \
     # /etc/supervisor/conf.d/init.conf \
-    file="/etc/supervisor/conf.d/init.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
-    perl -0p -i -e "s>supervisorctl start rclocal;>supervisorctl start rclocal; supervisorctl start httpd;>" ${file}; \
-    printf "Done patching ${file}...\n"; \
+    file="/etc/supervisor/conf.d/init.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
+    perl -0p -i -e "s>supervisorctl start rclocal;>supervisorctl start rclocal; supervisorctl start httpd;>" ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/supervisor/conf.d/httpd.conf \
-    file="/etc/supervisor/conf.d/httpd.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/supervisor/conf.d/httpd.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     printf "# HTTPd\n\
 [program:httpd]\n\
 command=/bin/bash -c \"\$(which apache2ctl) -d /etc/apache2 -f /etc/apache2/apache2.conf -D FOREGROUND\"\n\
 autostart=false\n\
 autorestart=true\n\
-\n" > ${file}; \
-    printf "Done patching ${file}...\n"; \
+\n" > ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     printf "Finished updading Supervisor configuration...\n";
 
 # HTTPd
-RUN printf "Updading HTTPd configuration...\n"; \
+RUN printf "Updading HTTPd configuration...\n" && \
     \
     # /etc/apache2/envvars \
-    file="/etc/apache2/envvars"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/apache2/envvars" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     # run as user/group \
-    perl -0p -i -e "s>APACHE_RUN_USER=.*>APACHE_RUN_USER=${app_httpd_global_user}>" ${file}; \
-    perl -0p -i -e "s>APACHE_RUN_GROUP=.*>APACHE_RUN_GROUP=${app_httpd_global_group}>" ${file}; \
-    printf "Done patching ${file}...\n"; \
+    perl -0p -i -e "s>APACHE_RUN_USER=.*>APACHE_RUN_USER=${app_httpd_global_user}>" ${file} && \
+    perl -0p -i -e "s>APACHE_RUN_GROUP=.*>APACHE_RUN_GROUP=${app_httpd_global_group}>" ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/apache2/apache2.conf \
-    file="/etc/apache2/apache2.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/apache2/apache2.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     # change log level \
-    perl -0p -i -e "s># alert, emerg.\n#\nLogLevel .*># alert, emerg.\n#\nLogLevel ${app_httpd_global_loglevel}>" ${file}; \
+    perl -0p -i -e "s># alert, emerg.\n#\nLogLevel .*># alert, emerg.\n#\nLogLevel ${app_httpd_global_loglevel}>" ${file} && \
     # change config directory \
-    perl -0p -i -e "s># Do NOT add a slash at the end of the directory path.\n#\nServerRoot .*># Do NOT add a slash at the end of the directory path.\n#\nServerRoot \"/etc/apache2\">" ${file}; \
+    perl -0p -i -e "s># Do NOT add a slash at the end of the directory path.\n#\nServerRoot .*># Do NOT add a slash at the end of the directory path.\n#\nServerRoot \"/etc/apache2\">" ${file} && \
     # replace optional config files \
-    perl -0p -i -e "s># Include generic snippets of statements\nInclude conf.d/># Include generic snippets of statements\nInclude conf.d/\*.conf>" ${file}; \
+    perl -0p -i -e "s># Include generic snippets of statements\nInclude conf.d/># Include generic snippets of statements\nInclude conf.d/\*.conf>" ${file} && \
     # replace vhost config files \
-    perl -0p -i -e "s># Include the virtual host configurations:\nInclude sites-enabled/># Include the virtual host configurations:\nInclude sites-enabled/\*.conf\n>" ${file}; \
+    perl -0p -i -e "s># Include the virtual host configurations:\nInclude sites-enabled/># Include the virtual host configurations:\nInclude sites-enabled/\*.conf\n>" ${file} && \
     # change timeout \
-    perl -0p -i -e "s># Timeout: The number of seconds before receives and sends time out.\n#\nTimeout .*># Timeout: The number of seconds before receives and sends time out.\n#\nTimeout ${app_httpd_global_listen_timeout}>" ${file}; \
+    perl -0p -i -e "s># Timeout: The number of seconds before receives and sends time out.\n#\nTimeout .*># Timeout: The number of seconds before receives and sends time out.\n#\nTimeout ${app_httpd_global_listen_timeout}>" ${file} && \
     # change keepalive \
-    perl -0p -i -e "s># one request per connection\). Set to \"Off\" to deactivate.\n#\nKeepAlive .*># one request per connection\). Set to \"Off\" to deactivate.\n#\nKeepAlive ${app_httpd_global_listen_keepalive_status}>" ${file}; \
-    perl -0p -i -e "s># We recommend you leave this number high, for maximum performance.\n#\nMaxKeepAliveRequests .*># We recommend you leave this number high, for maximum performance.\n#\nMaxKeepAliveRequests ${app_httpd_global_listen_keepalive_requests}>" ${file}; \
-    perl -0p -i -e "s># same client on the same connection.\n#\nKeepAliveTimeout .*># same client on the same connection.\n#\nKeepAliveTimeout ${app_httpd_global_listen_keepalive_timeout}>" ${file}; \
+    perl -0p -i -e "s># one request per connection\). Set to \"Off\" to deactivate.\n#\nKeepAlive .*># one request per connection\). Set to \"Off\" to deactivate.\n#\nKeepAlive ${app_httpd_global_listen_keepalive_status}>" ${file} && \
+    perl -0p -i -e "s># We recommend you leave this number high, for maximum performance.\n#\nMaxKeepAliveRequests .*># We recommend you leave this number high, for maximum performance.\n#\nMaxKeepAliveRequests ${app_httpd_global_listen_keepalive_requests}>" ${file} && \
+    perl -0p -i -e "s># same client on the same connection.\n#\nKeepAliveTimeout .*># same client on the same connection.\n#\nKeepAliveTimeout ${app_httpd_global_listen_keepalive_timeout}>" ${file} && \
     # add main directory directives \
     perl -0p -i -e "s>Include ports.conf>Include ports.conf\n\n\
 \# Sets the default security model of the Apache2 HTTPD server. It does\n\
@@ -228,27 +272,27 @@ RUN printf "Updading HTTPd configuration...\n"; \
 \#       AllowOverride None\n\
 \#       Allow from All\n\
 \#\</Directory\>\n\
->" ${file}; \
-    printf "Done patching ${file}...\n"; \
+>" ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/apache2/ports.conf \
-    file="/etc/apache2/ports.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
-    perl -0p -i -e "s>NameVirtualHost \*:80>NameVirtualHost ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_http}>g" ${file}; \
-    perl -0p -i -e "s>Listen 80>Listen ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_http}>g" ${file}; \
-    perl -0p -i -e "s>    Listen 443>    NameVirtualHost ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_http}\n    Listen ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_https}>g" ${file}; \
-    printf "Done patching ${file}...\n"; \
+    file="/etc/apache2/ports.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
+    perl -0p -i -e "s>NameVirtualHost \*:80>NameVirtualHost ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_http}>g" ${file} && \
+    perl -0p -i -e "s>Listen 80>Listen ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_http}>g" ${file} && \
+    perl -0p -i -e "s>    Listen 443>    NameVirtualHost ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_http}\n    Listen ${app_httpd_global_listen_addr}:${app_httpd_global_listen_port_https}>g" ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/apache2/conf.d/* \
     # Rename configuration files \
-    mv /etc/apache2/conf.d/charset /etc/apache2/conf.d/charset.conf; \
-    mv /etc/apache2/conf.d/localized-error-pages /etc/apache2/conf.d/localized-error-pages.conf; \
-    mv /etc/apache2/conf.d/other-vhosts-access-log /etc/apache2/conf.d/other-vhosts-access-log.conf; \
-    mv /etc/apache2/conf.d/security /etc/apache2/conf.d/security.conf; \
+    mv /etc/apache2/conf.d/charset /etc/apache2/conf.d/charset.conf && \
+    mv /etc/apache2/conf.d/localized-error-pages /etc/apache2/conf.d/localized-error-pages.conf && \
+    mv /etc/apache2/conf.d/other-vhosts-access-log /etc/apache2/conf.d/other-vhosts-access-log.conf && \
+    mv /etc/apache2/conf.d/security /etc/apache2/conf.d/security.conf && \
     \
     # /etc/apache2/conf.d/serve-cgi-bin.conf \
-    file="/etc/apache2/conf.d/serve-cgi-bin.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/apache2/conf.d/serve-cgi-bin.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     # add universal cgi-bin configuration \
     printf "<IfModule alias_module>\n\
     ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/\n\
@@ -259,39 +303,39 @@ RUN printf "Updading HTTPd configuration...\n"; \
         Allow from All\n\
     </Directory>\n\
 </IfModule>\n\
-\n" > ${file}; \
-    printf "Done patching ${file}...\n"; \
+\n" > ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/apache2/conf.d/security.conf \
-    file="/etc/apache2/conf.d/security.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/apache2/conf.d/security.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     # disable/replace badly configured defaults \
-    perl -0p -i -e "s>#ServerTokens Minimal\nServerTokens OS\n#ServerTokens Full>ServerTokens Minor>" ${file}; \
-    perl -0p -i -e "s>#ServerSignature Off\nServerSignature On>ServerSignature On>" ${file}; \
-    printf "Done patching ${file}...\n"; \
+    perl -0p -i -e "s>#ServerTokens Minimal\nServerTokens OS\n#ServerTokens Full>ServerTokens Minor>" ${file} && \
+    perl -0p -i -e "s>#ServerSignature Off\nServerSignature On>ServerSignature On>" ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/apache2/mods-available/ssl.conf \
-    file="/etc/apache2/mods-available/ssl.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/apache2/mods-available/ssl.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     # disable/replace badly configured defaults \
-    perl -0p -i -e "s>.*SSLProtocol all .*>SSLProtocol all -SSLv2 -SSLv3>" ${file}; \
-    perl -0p -i -e "s>.*SSLCipherSuite RC4.*>SSLCipherSuite ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS>" ${file}; \
-    perl -0p -i -e "s>.*SSLHonorCipherOrder on>SSLHonorCipherOrder On>" ${file}; \
+    perl -0p -i -e "s>.*SSLProtocol all .*>SSLProtocol all -SSLv2 -SSLv3>" ${file} && \
+    perl -0p -i -e "s>.*SSLCipherSuite RC4.*>SSLCipherSuite ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS>" ${file} && \
+    perl -0p -i -e "s>.*SSLHonorCipherOrder on>SSLHonorCipherOrder On>" ${file} && \
     perl -0p -i -e "s>\n\</IfModule\>>\n\
 \# See more information at:\n\
 \# https://mozilla.github.io/server-side-tls/ssl-config-generator/\?server=apache-2.2.22\&openssl=1.0.1p\&hsts=no\&profile=intermediate\n\
-\n\</IfModule\>>" ${file}; \
-    printf "Done patching ${file}...\n"; \
+\n\</IfModule\>>" ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # Additional configuration files \
-    mkdir /etc/apache2/incl.d; \
+    mkdir /etc/apache2/incl.d && \
     \
     # HTTPd vhost \
-    app_httpd_vhost_home="${app_httpd_global_home}/${app_httpd_vhost_id}"; \
+    app_httpd_vhost_home="${app_httpd_global_home}/${app_httpd_vhost_id}" && \
     \
     # /etc/apache2/incl.d/${app_httpd_vhost_id}-httpd.conf \
-    file="/etc/apache2/incl.d/${app_httpd_vhost_id}-httpd.conf"; \
-    printf "\n# Applying configuration for ${file}...\n"; \
+    file="/etc/apache2/incl.d/${app_httpd_vhost_id}-httpd.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
     printf "# HTTPd info and status\n\
 <IfModule info_module>\n\
   # HTTPd info\n\
@@ -307,37 +351,50 @@ RUN printf "Updading HTTPd configuration...\n"; \
     Allow from ${app_httpd_vhost_httpd_wlist}\n\
   </Location>\n\
 </IfModule>\n\
-\n" > ${file}; \
-    printf "Done patching ${file}...\n"; \
+\n" > ${file} && \
+    printf "Done patching ${file}...\n" && \
     \
     # Rename original vhost configuration \
-    mv /etc/apache2/sites-available/default /etc/apache2/sites-available/000-default.conf.orig; \
-    mv /etc/apache2/sites-available/default-ssl /etc/apache2/sites-available/000-default-ssl.conf.orig; \
+    mv /etc/apache2/sites-available/default /etc/apache2/sites-available/000-default.conf.orig && \
+    mv /etc/apache2/sites-available/default-ssl /etc/apache2/sites-available/000-default-ssl.conf.orig && \
     \
     # /etc/apache2/sites-available/${app_httpd_vhost_id}-http.conf \
-    file="/etc/apache2/sites-available/${app_httpd_vhost_id}-http.conf"; \
-    cp "/etc/apache2/sites-available/000-default.conf.orig" $file; \
-    printf "\n# Applying configuration for ${file}...\n"; \
-    printf "Done patching ${file}...\n"; \
+    file="/etc/apache2/sites-available/${app_httpd_vhost_id}-http.conf" && \
+    cp "/etc/apache2/sites-available/000-default.conf.orig" $file && \
+    printf "\n# Applying configuration for ${file}...\n" && \
+    printf "Done patching ${file}...\n" && \
     \
     # /etc/apache2/sites-available/${app_httpd_vhost_id}-https.conf \
-    file="/etc/apache2/sites-available/${app_httpd_vhost_id}-https.conf"; \
-    cp "/etc/apache2/sites-available/000-default-ssl.conf.orig" $file; \
-    printf "\n# Applying configuration for ${file}...\n"; \
-    printf "Done patching ${file}...\n"; \
+    file="/etc/apache2/sites-available/${app_httpd_vhost_id}-https.conf" && \
+    cp "/etc/apache2/sites-available/000-default-ssl.conf.orig" $file && \
+    printf "\n# Applying configuration for ${file}...\n" && \
+    printf "Done patching ${file}...\n" && \
     \
-    printf "\n# Generating certificates...\n"; \
-    make-ssl-cert generate-default-snakeoil --force-overwrite; \
-    printf "\n# Done generating certificates...\n"; \
+    printf "\n# Generating certificates...\n" && \
+    make-ssl-cert generate-default-snakeoil --force-overwrite && \
+    printf "\n# Done generating certificates...\n" && \
     \
-    printf "\n# Enabling/disabling vhosts...\n"; \
-    a2dissite 000-default; \
-    a2ensite ${app_httpd_vhost_id}-http.conf ${app_httpd_vhost_id}-https.conf; \
-    printf "\n# Done enabling/disabling vhosts...\n"; \
+    printf "\n# Enabling/disabling vhosts...\n" && \
+    a2dissite 000-default && \
+    a2ensite ${app_httpd_vhost_id}-http.conf ${app_httpd_vhost_id}-https.conf && \
+    printf "\n# Done enabling/disabling vhosts...\n" && \
     \
-    printf "\n# Testing configuration...\n"; \
-    echo "Testing $(which apache2ctl):"; $(which apache2ctl) -V; $(which apache2ctl) configtest; $(which apache2ctl) -S; \
-    printf "Done testing configuration...\n"; \
+    printf "\n# Testing configuration...\n" && \
+    echo "Testing $(which apache2ctl):"; $(which apache2ctl) -V; $(which apache2ctl) configtest; $(which apache2ctl) -S && \
+    printf "Done testing configuration...\n" && \
     \
     printf "Finished updading HTTPd configuration...\n";
+
+#
+# Run
+#
+
+# Command to execute
+# Defaults to /bin/bash.
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf", "--nodaemon"]
+
+# Ports to expose
+# Defaults to 80 and 443
+EXPOSE ${app_httpd_global_listen_port_http}
+EXPOSE ${app_httpd_global_listen_port_https}
 
