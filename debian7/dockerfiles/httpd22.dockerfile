@@ -339,6 +339,13 @@ RUN printf "Updading HTTPd configuration...\n" && \
 \n\</IfModule\>>" ${file} && \
     printf "Done patching ${file}...\n" && \
     \
+    # /etc/apache2/conf.d/other-vhosts-access-log.conf \
+    file="/etc/apache2/conf.d/other-vhosts-access-log.conf" && \
+    printf "\n# Applying configuration for ${file}...\n" && \
+    # change logging \
+    perl -0p -i -e "s>CustomLog .*>CustomLog /proc/self/fd/1 vhost_combined>" ${file} && \
+    printf "Done patching ${file}...\n" && \
+    \
     # Additional configuration files \
     mkdir /etc/apache2/incl.d && \
     \
@@ -364,13 +371,6 @@ RUN printf "Updading HTTPd configuration...\n" && \
   </Location>\n\
 </IfModule>\n\
 \n" > ${file} && \
-    printf "Done patching ${file}...\n" && \
-    \
-    # /etc/apache2/conf-available/other-vhosts-access-log.conf \
-    file="/etc/apache2/conf-available/other-vhosts-access-log.conf" && \
-    printf "\n# Applying configuration for ${file}...\n" && \
-    # change logging \
-    perl -0p -i -e "s># Define an access log for VirtualHosts that don't define their own logfile\nCustomLog .*># Define an access log for VirtualHosts that don't define their own logfile\nCustomLog /proc/self/fd/1 vhost_combined>" ${file} && \
     printf "Done patching ${file}...\n" && \
     \
     # Rename original vhost configuration \
